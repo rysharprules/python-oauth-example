@@ -1,12 +1,15 @@
 import os
 
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, request
 from dotenv import load_dotenv
 from flask_login import LoginManager, current_user, login_user
 from oauthlib.oauth2 import WebApplicationClient
 
 import db
 from user_repo import fetch_user, ensure_user_exists
+import sys
+import requests
+import json
 
 load_dotenv()
 
@@ -28,7 +31,6 @@ client = WebApplicationClient(CLIENT_ID)
 def load_user(user_id):
     return fetch_user(user_id)
 
-
 @app.route('/')
 def index():
     if current_user.is_authenticated:
@@ -36,20 +38,27 @@ def index():
     else:
         return render_template('login.html')
 
-
 @app.route('/login')
 def login():
-    # Redirect the user to GitHub's OAuth Login Page
-    pass
-
+    return redirect(client.prepare_request_uri('https://github.com/login/oauth/authorize'))
 
 @app.route('/login/callback')
 def callback():
     # 1) Parse the response from GitHub to find the temporary code
+    code = request.args.get('code')
     # 2) Use that code to collect an access token from GitHub
+    token_url, headers, body = client.prepare_token_request('https://github.com/login/oauth/access_token', code=code)
+    token_response = requests.post(
+        token_url,
+        headers=headers,
+        data=body,
+        auth=(CLIENT_ID, CLIENT_SECRET),
+    )
+    client.parse_request_body_response(json.dumps(token_response.json()))
     # 3) Use the access token to access the data we want
+    uri, headers, body = client.add_token('https://api.github.com/user')
     # 4) Construct a new user object using that data
-
+    print(body, file=sys.stdout)
     user = None  # replace this line!!
 
     ensure_user_exists(user)
