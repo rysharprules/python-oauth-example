@@ -1,5 +1,9 @@
-# OAuth Sample App
+# OAuth Fiat Cinquecento by [rysharprules](https://github.com/rysharprules)
 A small sample app to experiment with using OAuth.
+
+![Fiat Cinquecento](img/fiat.png)
+
+<img src='img/auth.png' height=220 /><img src='img/result.png' height=220 />
 
 ## Getting Started
 The easiest way to get started is by using the setup script.
@@ -44,3 +48,4 @@ You should now be able to run the app by running:
 from the root of your project directory.
 
 You can then access your application by visiting `https://127.0.0.1:5000/` in your browser.
+
